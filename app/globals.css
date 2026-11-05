@@ -1,0 +1,182 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+  Design tokens (المواصفات: الواجهة والتصميم)
+  - one brand color (bluish green), amber "signal" only for live RFID reads and forecasts,
+    and separate status colors. Values are RGB channels for Tailwind opacity modifiers.
+*/
+:root {
+  color-scheme: light;
+  --bg: 237 241 240; /* #EDF1F0 */
+  --surface: 255 255 255;
+  --sunk: 244 247 246;
+  --ink: 19 33 31;
+  --muted: 90 107 103;
+  --line: 211 220 217;
+  --brand: 14 107 102; /* #0E6B66 */
+  --brand-ink: 255 255 255;
+  --brand-soft: 220 237 234;
+  --signal: 185 127 0; /* #B97F00 */
+  --signal-soft: 251 240 211;
+  --ok: 44 125 79; /* #2C7D4F healthy */
+  --ok-soft: 221 240 227;
+  --warn: 174 100 0; /* #AE6400 low */
+  --warn-soft: 251 235 210;
+  --crit: 184 50 40; /* #B83228 critical */
+  --crit-soft: 248 222 218;
+  --stale: 86 91 140; /* #565B8C stagnant */
+  --stale-soft: 229 230 243;
+  /* نص الشارات الصغيرة: نفس اللون بدرجة أغمق حتى يحقق تباين 4.5:1 (العلامات تبقى بألوان المواصفات) */
+  --crit-ink: 184 50 40;
+  --warn-ink: 155 89 0; /* #9B5900 */
+  --ok-ink: 41 118 74; /* #29764A */
+  --stale-ink: 86 91 140;
+  --signal-ink: 144 99 0; /* #906300 */
+  --shadow: 0 1px 2px rgba(19, 33, 31, 0.06), 0 4px 14px rgba(19, 33, 31, 0.04);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: 13 21 20; /* #0D1514 */
+    --surface: 20 30 28;
+    --sunk: 16 25 23;
+    --ink: 228 236 234;
+    --muted: 147 164 160;
+    --line: 37 51 47;
+    --brand: 64 179 166; /* #40B3A6 */
+    --brand-ink: 6 32 29;
+    --brand-soft: 22 49 45;
+    --signal: 240 190 74; /* #F0BE4A */
+    --signal-soft: 58 47 18;
+    --ok: 92 196 138;
+    --ok-soft: 20 48 31;
+    --warn: 240 166 58;
+    --warn-soft: 58 40 16;
+    --crit: 240 113 103;
+    --crit-soft: 59 26 23;
+    --stale: 163 167 223;
+    --stale-soft: 35 36 60;
+    --crit-ink: 240 113 103;
+    --warn-ink: 240 166 58;
+    --ok-ink: 92 196 138;
+    --stale-ink: 163 167 223;
+    --signal-ink: 240 190 74;
+    --shadow: none;
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: 13 21 20;
+  --surface: 20 30 28;
+  --sunk: 16 25 23;
+  --ink: 228 236 234;
+  --muted: 147 164 160;
+  --line: 37 51 47;
+  --brand: 64 179 166;
+  --brand-ink: 6 32 29;
+  --brand-soft: 22 49 45;
+  --signal: 240 190 74;
+  --signal-soft: 58 47 18;
+  --ok: 92 196 138;
+  --ok-soft: 20 48 31;
+  --warn: 240 166 58;
+  --warn-soft: 58 40 16;
+  --crit: 240 113 103;
+  --crit-soft: 59 26 23;
+  --stale: 163 167 223;
+  --stale-soft: 35 36 60;
+  --crit-ink: 240 113 103;
+  --warn-ink: 240 166 58;
+  --ok-ink: 92 196 138;
+  --stale-ink: 163 167 223;
+  --signal-ink: 240 190 74;
+  --shadow: none;
+}
+
+@layer base {
+  * {
+    @apply border-line;
+  }
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-background font-sans text-foreground antialiased;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+  :focus-visible {
+    outline: 2px solid rgb(var(--brand));
+    outline-offset: 2px;
+  }
+}
+
+@layer utilities {
+  /* Latin digits with fixed width (tabular-nums) */
+  .num {
+    font-variant-numeric: tabular-nums;
+  }
+  /* EPC numbers, times and big numbers: IBM Plex Mono, kept LTR inside RTL text */
+  .mono {
+    font-family: var(--font-mono), ui-monospace, Menlo, Consolas, monospace;
+    font-variant-numeric: tabular-nums;
+    direction: ltr;
+    unicode-bidi: isolate;
+  }
+  .scrollbar-none {
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+  /* وميض خفيف للقراءة أو التنبيه الجديد */
+  .flash-row > td,
+  .flash-bg {
+    animation: mh-flash 1.6s ease-out;
+  }
+}
+
+@keyframes mh-flash {
+  from {
+    background-color: rgb(var(--signal-soft));
+  }
+}
+
+@keyframes mh-wave {
+  0% {
+    transform: scale(0.4);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+/* نبضة الهوائي مع كل قراءة */
+.gate-ant i {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  border: 2px solid rgb(var(--signal));
+  opacity: 0;
+}
+.gate-hit .gate-ant i {
+  animation: mh-wave 0.9s ease-out;
+}
+.gate-hit .gate-ant i:nth-child(2) {
+  animation-delay: 0.18s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
