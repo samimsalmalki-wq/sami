@@ -118,6 +118,7 @@ TEST_DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres npm te
 | GET | `/api/alerts?status=open` | التنبيهات |
 | PATCH | `/api/alerts/:id` | تأكيد أو إغلاق تنبيه |
 | POST | `/api/simulator` | أزرار سيناريوهات العرض (مع `SIMULATOR_ENABLED=true`) |
+| GET / POST | `/api/setup` | حالة قاعدة البيانات، والتهيئة بـ `SETUP_TOKEN` (صفحة `/setup`) |
 
 ```json
 {
@@ -128,11 +129,30 @@ TEST_DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres npm te
 }
 ```
 
-## النشر (Vercel + Supabase)
+## النشر (Vercel + Supabase) بدون سطر أوامر
 
-1. أنشئ مشروع Supabase وطبّق المخطط والبيانات من جهازك: `npm run db:reset` مع `DATABASE_URL` للمشروع.
-2. اربط المستودع بـ Vercel وأضف متغيرات `.env.example` نفسها. اجعل `DATABASE_URL` على **Transaction pooler**، واختر منطقة Vercel قريبة من منطقة Supabase.
-3. `SIMULATOR_ENABLED=true` يُقرأ وقت البناء: غيّره ثم أعد النشر. قبل المرحلة 3 (المصادقة) أي شخص عنده الرابط يقدر يشغّل السيناريوهات، فلا تفعّله إلا لنسخة العرض.
+1. **Supabase:** من [supabase.com/dashboard](https://supabase.com/dashboard) أنشئ مشروعًا جديدًا (New project) واحفظ كلمة مرور قاعدة البيانات. لما يجهز:
+   - اضغط **Connect** أعلى الصفحة، ثم **Transaction pooler**، وانسخ الرابط بعد ما تستبدل `[YOUR-PASSWORD]` بكلمة المرور. هذا هو `DATABASE_URL`.
+   - من **Project Settings ← API Keys** انسخ **Project URL** والمفتاح العام **anon** (أو publishable).
+2. **Vercel:** من [vercel.com/new](https://vercel.com/new) اختر **Import** لهذا المستودع، وقبل **Deploy** افتح **Environment Variables** وأضف:
+
+   | المتغير | القيمة |
+   | --- | --- |
+   | `DATABASE_URL` | رابط Transaction pooler من الخطوة 1 |
+   | `NEXT_PUBLIC_SUPABASE_URL` | Project URL |
+   | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | المفتاح العام anon |
+   | `RFID_DEVICE_KEY` | نص عشوائي طويل (مفتاح القارئات والمحاكي) |
+   | `SETUP_TOKEN` | نص عشوائي ثاني (رمز صفحة التهيئة) |
+   | `SIMULATOR_ENABLED` | `true` لنسخة العرض |
+
+3. **التهيئة:** بعد ما ينتهي النشر افتح `https://<اسم-المشروع>.vercel.app/setup`، أدخل `SETUP_TOKEN` واضغط «تهيئة وتعبئة البيانات التجريبية». تنشئ الجداول والبث اللحظي وتعبّئ البيانات. ونفس الصفحة ترجع البيانات لحالتها الأولى قبل كل عرض.
+
+ملاحظات:
+- بديل للخطوة 1: تكامل Supabase داخل Vercel (Storage ← Supabase) ينشئ القاعدة ويضيف `POSTGRES_URL` ومتغيرات `NEXT_PUBLIC_SUPABASE_*` تلقائيًا، والمنصة تقرأ `POSTGRES_URL` إذا ما وُجد `DATABASE_URL`. أضف بعدها المتغيرات الثلاثة الباقية وأعد النشر.
+- `SIMULATOR_ENABLED` يُقرأ وقت البناء: لو غيّرته أعد النشر (Redeploy).
+- اجعل منطقة الدوال في Vercel (Settings ← Functions) قريبة من منطقة Supabase حتى يكون التحديث أسرع.
+- قبل المرحلة 3 (المصادقة) أي شخص عنده الرابط يشوف البيانات ويشغّل السيناريوهات، فاستخدم البيانات التجريبية فقط.
+- محاكي سطر الأوامر على النسخة المنشورة: ضع `DATABASE_URL` و`RFID_DEVICE_KEY` نفسها في `.env.local` ثم `npm run sim -- live --url https://<اسم-المشروع>.vercel.app`.
 
 ## قرارات اتخذتها حيث المواصفات ما حددت
 

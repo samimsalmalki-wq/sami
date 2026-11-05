@@ -10,7 +10,7 @@
  *
  * خيارات: --url http://localhost:3000   --interval 1500
  */
-import { requireEnv } from "./env";
+import { requireDatabaseUrl, requireEnv } from "./env";
 import { createSql } from "@/lib/server/db";
 import { runScenario, type ScenarioName, type SimContext } from "@/lib/simulator/scenarios";
 import type { WireRead } from "@/lib/simulator/passes";
@@ -37,7 +37,7 @@ async function main() {
   const baseUrl = (option("url") ?? process.env.SIMULATOR_BASE_URL ?? "http://localhost:3000").replace(/\/$/, "");
   const deviceKey = requireEnv("RFID_DEVICE_KEY");
   const interval = Number(option("interval") ?? 1500);
-  const sql = createSql(requireEnv("DATABASE_URL"), { max: 2 });
+  const sql = createSql(requireDatabaseUrl(), { max: 2 });
 
   let raw = 0;
   let duplicates = 0;

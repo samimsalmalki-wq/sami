@@ -15,8 +15,30 @@ declare global {
   var __makhzoonSql: Sql | undefined;
 }
 
-export function createSql(url: string, options: { max?: number } = {}): Sql {
+/** رابط قاعدة البيانات: DATABASE_URL، أو POSTGRES_URL اللي يضيفه تكامل Supabase في Vercel تلقائيًا */
+export function databaseUrl(): string | undefined {
+  return process.env.DATABASE_URL || process.env.POSTGRES_URL || undefined;
+}
+
+const LOCAL_HOSTS = new Set(["localhost", "127.0.0.1", "::1", "[::1]", "host.docker.internal"]);
+
+/**
+ * postgres.js يرسل أي معامل غير معروف في الرابط كإعداد للاتصال (مثل supa=base-pooler.x في روابط Vercel)
+ * والخادم قد يرفضه، فنحذف المعاملات ونبقي sslmode فقط. الاتصال البعيد مشفّر افتراضيًا.
+ */
+export function connectionConfig(raw: string): { url: string; ssl: false | "require" | "verify-full" } {
+  const url = new URL(raw);
+  const sslmode = url.searchParams.get("sslmode");
+  for (const key of [...url.searchParams.keys()]) url.searchParams.delete(key);
+  const local = LOCAL_HOSTS.has(url.hostname);
+  const ssl = sslmode === "disable" ? false : sslmode === "verify-full" ? "verify-full" : local && !sslmode ? false : "require";
+  return { url: url.toString(), ssl };
+}
+
+export function createSql(rawUrl: string, options: { max?: number } = {}): Sql {
+  const { url, ssl } = connectionConfig(rawUrl);
   return postgres(url, {
+    ssl,
     // Supabase transaction pooler (6543) does not support prepared statements.
     prepare: false,
     max: options.max ?? 5,
@@ -49,7 +71,7 @@ export function createSql(url: string, options: { max?: number } = {}): Sql {
 
 export function getSql(): Sql {
   if (!globalThis.__makhzoonSql) {
-    const url = process.env.DATABASE_URL;
+    const url = databaseUrl();
     if (!url) {
       throw new Error("DATABASE_URL is not set. Copy .env.example to .env.local and fill it in.");
     }
