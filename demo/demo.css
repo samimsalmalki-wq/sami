@@ -1,0 +1,6 @@
+/* الخطوط من Google Fonts (في نسخة Next.js تأتي من next/font) */
+:root {
+  --font-body: "IBM Plex Sans Arabic";
+  --font-display: "Readex Pro";
+  --font-mono: "IBM Plex Mono";
+}

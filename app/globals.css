@@ -115,7 +115,22 @@
   }
 }
 
+/* شريط الحافة العلوية في الجوال (تحت مؤشرات النظام) بلون الترويسة */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0 0 auto;
+  height: env(safe-area-inset-top, 0px);
+  z-index: 40;
+  background: rgb(var(--surface));
+}
+
 @layer utilities {
+  /* هامش جانبي 16px على الأقل، ويبتعد عن شريط النظام الجانبي في الجوال */
+  .gutter {
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
   /* Latin digits with fixed width (tabular-nums) */
   .num {
     font-variant-numeric: tabular-nums;

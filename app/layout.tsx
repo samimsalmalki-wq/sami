@@ -40,7 +40,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <Providers simulatorEnabled={process.env.SIMULATOR_ENABLED === "true"}>
           <AppHeader />
-          <main className="mx-auto max-w-[1240px] px-4 pb-12 pt-5">{children}</main>
+          <main className="gutter mx-auto max-w-[1240px] pb-12 pt-5">{children}</main>
         </Providers>
       </body>
     </html>

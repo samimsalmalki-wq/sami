@@ -9,6 +9,8 @@ export function Toaster() {
       dir="rtl"
       position="bottom-center"
       visibleToasts={4}
+      offset={{ bottom: "max(16px, env(safe-area-inset-bottom, 0px))" }}
+      mobileOffset={{ bottom: "max(16px, env(safe-area-inset-bottom, 0px))" }}
       duration={6000}
       toastOptions={{
         unstyled: true,

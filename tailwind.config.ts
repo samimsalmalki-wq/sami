@@ -6,7 +6,7 @@ import animate from "tailwindcss-animate";
 const token = (name: string) => `rgb(var(--${name}) / <alpha-value>)`;
 
 const config: Config = {
-  content: ["./app/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./lib/**/*.{ts,tsx}"],
+  content: ["./app/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./lib/**/*.{ts,tsx}", "./demo/**/*.{ts,tsx}"],
   theme: {
     container: { center: true, padding: "1rem", screens: { "2xl": "1240px" } },
     extend: {

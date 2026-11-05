@@ -12,7 +12,7 @@ import type {
 } from "@/lib/api-types";
 import type { AlertStatus } from "@/lib/inventory/alerts";
 import { usePollInterval } from "@/components/live-provider";
-import { getJson, sendJson } from "./api";
+import { getJson, sendJson } from "@/lib/client/api";
 
 /** مفاتيح الاستعلام: الجزء الأول هو اللي يُبطله البث اللحظي */
 export function useSummary() {

@@ -89,8 +89,8 @@ export function AppHeader() {
   const connection = CONNECTION[status];
 
   return (
-    <header className="sticky top-0 z-30 border-b border-line bg-surface">
-      <div className="mx-auto max-w-[1240px] px-4 pt-3">
+    <header className="sticky top-[env(safe-area-inset-top,0px)] z-30 border-b border-line bg-surface">
+      <div className="gutter mx-auto max-w-[1240px] pt-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <Link href="/" className="flex min-w-0 items-center gap-3">
             <span className="grid size-10 flex-none place-items-center rounded-[10px] bg-brand text-brand-ink">
